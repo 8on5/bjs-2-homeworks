@@ -83,26 +83,56 @@ class Library {
 
 	// Поиск книги в хранилище
 	findBookBy(type, value) {
-		let findResult = null;
-
-		this.books.forEach((book) => {
-			if ((type in book) && (Object.values(book).includes(value))) {
-				findResult = book;
-			}
-		});
-		return findResult;
-
+		return this.books.find((book) => book[type] === value) || null;
 	}
 
-	// Выдача книги из хранилища
+	// Выдача книги
 	giveBookByName(bookName) {
-		let givenBook = null;
+		const findResult = this.findBookBy('name', bookName);
+		if (!findResult) return null;
+		this.books = this.books.filter((book) => book.name !== bookName);
+		return findResult;
+	}
+}
 
-		this.books.forEach((book, bookIndex) => {
-			if (Object.values(book).includes(bookName)) {
-				[givenBook] = this.books.splice(bookIndex, 1);
-			}
-		});
-		return givenBook;
+// ЗАДАЧА 3. Журнал успеваемости.
+class Student {
+	constructor(name) {
+		this.name = name;
+		this.marks = {};
+	}
+
+	get marks() {
+		return this._marks;
+	}
+
+	set marks(studentMark) {
+		this._marks = studentMark;
+	}
+
+	// Добавление оценки по предмету
+	addMark(mark, subject) {
+		const studentMark = this.marks;
+
+		if (mark < 2 || mark > 5) return;
+		(subject in studentMark) ? studentMark[subject].push(mark): studentMark[subject] = [mark];
+	}
+
+	// Средняя оценка по одному предмету
+	getAverageBySubject(subject) {
+		if (!(subject in this.marks)) return 0;
+		const marksSumBySubject = this.marks[subject].reduce((sum, mark) => sum + mark);
+
+		return marksSumBySubject / this.marks[subject].length;
+	}
+
+	// Средняя оценка по всем предметам
+	getAverage() {
+		const subjects = Object.keys(this.marks);
+		const avgMarksBySubjects = [];
+
+		subjects.forEach((subject) => avgMarksBySubjects.push(this.getAverageBySubject(subject)));
+		if (avgMarksBySubjects.length === 0) return 0;
+		return avgMarksBySubjects.reduce((sum, mark) => sum + mark) / avgMarksBySubjects.length;
 	}
 }
